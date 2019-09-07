@@ -17,26 +17,24 @@ app.get("/", (req, res) => {
 	res.send("Hi! This is the instagram bot that send r/dankmemes posts! Thanks for keeping me alive!")
 })
 app.post("/reddit", (req, res) => {
+	res.sendStatus(200);
 	if (req.body.key == process.env.KEY) {
 		(async () => {
 			console.log("Recieved Reddit Post... Uploading....")
 			await login()
-			await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK).then(font => {
+			await Jimp.loadFont(Jimp.FONT_SANS_12_BLACK).then(font => {
 				Jimp.read(req.body.image, async (err, img) => {
 					if (err) throw err;
-					img.print(
-						font,
-						10,
-						10, "dankmemes2208")
 					img
-						.write('meme.jpg');
-					const publishResult = await ig.publish.photo({
-						file: await Bluebird.fromCallback(cb => readFile("/app/meme.jpg", cb)),
-						caption: "Title: " + req.body.title + " ----------------- created by user: " + req.body.author
-					});
-
-					console.log('Uploaded new hot post!')
-					res.end("doned")
+          				.getBuffer( "image/jpeg", async (err,Buff) => {
+							const publishResult = await ig.publish.photo({
+								file: Buff,
+								caption: "Title: " + req.body.title + " ----------------- created by user: " + req.body.author
+							});
+		
+							console.log('Uploaded new hot post!')
+							res.end("doned")
+           				})
 				});
 			});
 		})()
